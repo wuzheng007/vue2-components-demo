@@ -1,6 +1,11 @@
 <template>
   <div>
-    <CustomTable v-bind="tableProps">
+    <CustomTable
+      :pageNumber.sync="tableProps.pageNumber"
+      :pageSize.sync="tableProps.pageSize"
+      v-bind="tableProps"
+      @page-change="onPageChange"
+    >
       <template #nameHeader="{ column }">
         <span>{{ column.label }}-自定义表头</span>
       </template>
@@ -23,6 +28,12 @@ export default {
   data() {
     return {
       tableProps: {
+        loading: false,
+        pagination: true, // 开启分页
+        pageNumber: 1,
+        pageSize: 10,
+        total: 0, // 表格数组总数
+        maxHeight: '100%',
         data: [],
         columns: [
           {
@@ -117,45 +128,61 @@ export default {
     };
   },
   created() {
-    this.tableProps.data = [
-      {
-        name: "张三",
-        age: 18,
-        gender: "男",
-        companyName: "公司A",
-        job: "开发",
-        entryTime: "2021-01-01",
-      },
-      {
-        name: "李花",
-        age: 20,
-        gender: "女",
-        companyName: "公司B",
-        job: "设计",
-        entryTime: "2020-05-15",
-      },
-      {
-        name: "王五",
-        age: 22,
-        gender: "男",
-        companyName: "公司C",
-        job: "测试",
-        entryTime: "2019-03-10",
-      },
-      {
-        name: "赵翠",
-        age: 24,
-        gender: "女",
-        companyName: "公司D",
-        job: "产品",
-        entryTime: "2018-07-20",
-      },
-    ];
+    this.fetchTableData();
   },
-  mounted() {
-    setTimeout(() => {
-      // this.tableProps.columns[2].prop = 'age'
-    }, 2000);
+  methods: {
+    /**
+     * 表格分页变化
+     */
+    onPageChange() {
+      this.fetchTableData()
+    },
+    /**
+     * 获取表格数据
+     */
+    async fetchTableData() {
+      try {
+        this.tableProps.loading =true
+        const { pageNumber, pageSize } = this.tableProps
+        const reqData = {
+          pageNumber,
+          pageSize
+        }
+        const { total, rows } = await this.getList(reqData)
+        this.tableProps.data = rows
+        this.tableProps.total = total
+      }catch(err) {
+        console.error(err)
+      }finally{
+        this.tableProps.loading = false
+      }
+    },
+    /**
+     * 模拟接口请求
+     * @param data 请求参数
+     */
+    getList(data) {
+      console.log('请求参数', data)
+      const { pageSize } = data
+      const temp = Array.from({ length: pageSize }).map((item, index) => {
+        return {
+          name: `姓名${index + 1}`,
+          age: 20 + index,
+          gender: index % 2 === 0 ? "男" : "女",
+          companyName: `公司${String.fromCharCode(65 + (index % 4))}`,
+          job: ["开发", "设计", "测试", "产品"][index % 4],
+          entryTime: `202${index % 3}-0${(index % 3) + 1}-01`,
+        };
+      })
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            total: 100,
+            rows: temp
+          });
+        }, 1200)
+      })
+    }
   },
 };
 </script>

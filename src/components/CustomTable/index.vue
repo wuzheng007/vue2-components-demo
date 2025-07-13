@@ -35,7 +35,7 @@
       <slot name="footer">
         <el-pagination
           v-if="pagination"
-          :current-page="pageNum"
+          :current-page="pageNumber"
           :page-size="pageSize"
           :page-sizes="[10, 30, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
@@ -96,7 +96,7 @@ export default {
     /**
      * 分页页码, 支持 .sync 修饰符
      */
-    pageNum: {
+    pageNumber: {
       type: Number,
       default: 1,
     },
@@ -114,20 +114,18 @@ export default {
      * @param {Number} pageSize 每页显示条
      */
     handleSizeChange(pageSize) {
-      const { total, pageNum } = this;
       this.$emit("update:pageSize", pageSize);
-      // 如果总页码小于当前页码，则当前页码会变化，触发handleCurrentChange
-      if (Math.ceil(total / pageSize) <= pageNum) {
-        this.$emit("page-change", { pageSize });
-      }
+      // 重置页码为 1
+      this.$emit("update:pageNumber", 1);
+      this.$emit("page-change", { pageNumber: 1, pageSize });
     },
     /**
      * 分页页码改变
-     * @param {Number} pageNum 当前页码
+     * @param {Number} pageNumber 当前页码
      */
-    handleCurrentChange(pageNum) {
-      this.$emit("update:currentPage", pageNum);
-      this.$emit("page-change", { pageNum });
+    handleCurrentChange(pageNumber) {
+      this.$emit("update:pageNumber", pageNumber);
+      this.$emit("page-change", { pageNumber });
     },
   },
 };
