@@ -1,6 +1,6 @@
 <template>
   <div>
-    首页
+    <router-link to="table">表格组件</router-link>
   </div>
 </template>
 

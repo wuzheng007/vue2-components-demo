@@ -10,7 +10,15 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (home.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "home" */ '../views/home')
+    component: () => import(/* webpackChunkName: "home" */ '@/views/home')
+  },
+  {
+    path: '/table',
+    name: 'table',
+    // route level code-splitting
+    // this generates a separate chunk (table.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "table" */ '@/views/table')
   }
 ]
 
