@@ -28,12 +28,13 @@ export default {
   data() {
     return {
       tableProps: {
+        ref: "customTable",
         loading: false,
         pagination: true, // 开启分页
         pageNumber: 1,
         pageSize: 10,
         total: 0, // 表格数组总数
-        maxHeight: '100%',
+        maxHeight: '500px',
         data: [],
         columns: [
           {
@@ -102,6 +103,7 @@ export default {
                     props: { type: "text" },
                     on: {
                       click: () => {
+                        console.log("表格ref", this.$refs.customTable.getTableRef());
                         console.log("编辑", row, column, $index);
                       },
                     },

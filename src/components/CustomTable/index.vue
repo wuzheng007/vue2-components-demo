@@ -11,7 +11,7 @@
     </section>
     <!-- 表格主体 -->
     <section class="table__body">
-      <el-table v-bind="$attrs" v-on="$listeners" :border="border">
+      <el-table ref="tableRef" v-bind="$attrs" v-on="$listeners" :border="border">
         <!-- el-table的empty插槽， 表格空数据时显示的内容， -->
         <template #empty>
           <slot name="empty" />
@@ -25,7 +25,6 @@
           v-for="(col, index) in columns"
           :key="col.key || `table-column-${col.prop || index}`"
           :column="col"
-          :scopedSlots="$scopedSlots"
         >
         </table-column>
       </el-table>
@@ -40,8 +39,8 @@
           :page-sizes="[10, 30, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @size-change="$_handleSizeChange"
+          @current-change="$_handleCurrentChange"
         />
       </slot>
     </section>
@@ -51,6 +50,11 @@
 <script>
 export default {
   inheritAttrs: false,
+  provide() {
+    return {
+      tableSlots: this.$scopedSlots, // 提供当前组件的插槽给子组件使用
+    }
+  },
   components: {
     TableColumn: () => import("./components/TableColumn.vue"),
   },
@@ -110,10 +114,16 @@ export default {
   },
   methods: {
     /**
+     * 获取表格的ref引用
+     */
+    getTableRef() {
+      return this.$refs.tableRef;
+    },
+    /**
      * 分页大小改变
      * @param {Number} pageSize 每页显示条
      */
-    handleSizeChange(pageSize) {
+    $_handleSizeChange(pageSize) {
       this.$emit("update:pageSize", pageSize);
       // 重置页码为 1
       this.$emit("update:pageNumber", 1);
@@ -123,7 +133,7 @@ export default {
      * 分页页码改变
      * @param {Number} pageNumber 当前页码
      */
-    handleCurrentChange(pageNumber) {
+    $_handleCurrentChange(pageNumber) {
       this.$emit("update:pageNumber", pageNumber);
       this.$emit("page-change", { pageNumber });
     },

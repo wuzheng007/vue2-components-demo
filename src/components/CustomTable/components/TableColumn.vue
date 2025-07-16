@@ -2,16 +2,12 @@
 export default {
   name: "TableColumn",
   inheritAttrs: false,
+  inject: ["tableSlots"], // 注入父组件提供的插槽
   props: {
     // 列配置
     column: {
       type: Object,
       required: true,
-    },
-    // 插槽
-    scopedSlots: {
-      type: Object,
-      default: () => ({}),
     },
   },
   methods: {
@@ -20,7 +16,7 @@ export default {
      * @param h
      */
     renderMultiHeaderColumn(h) {
-      const { column, scopedSlots } = this;
+      const { column } = this;
       return h(
         "el-table-column",
         {
@@ -32,7 +28,7 @@ export default {
         column.children.map((child, i) =>
           h("TableColumn", {
             key: child.key || `table-column-${child.prop || i}`,
-            props: { column: child, scopedSlots },
+            props: { column: child }
           })
         )
       );
@@ -78,7 +74,7 @@ export default {
       const name = col.headerSlot;
       if (name) {
         // 使用表头插槽
-        return this.scopedSlots[name]?.({ column, $index }) || column.label;
+        return this.tableSlots[name]?.({ column, $index }) || column.label;
       } else {
         // 默认表头渲染
         return column.label;
@@ -96,7 +92,7 @@ export default {
         return this.column.render(h, { row, column, $index });
       } else if (this.column.slot) {
         // 使用插槽渲染
-        return this.scopedSlots[this.column.slot]?.({
+        return this.tableSlots[this.column.slot]?.({
           row,
           column,
           $index,
